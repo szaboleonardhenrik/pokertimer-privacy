@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0f1419">
+    <title>Yilmaz Attila legénybúcsúja</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E♠%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<div class="quote-ticker" id="quoteTicker" aria-live="polite">
+    <img class="quote-ticker-avatar" id="quoteTickerAvatar" src="images/mc-isti-1.jpg" alt="MC Isti" onerror="this.style.display='none'">
+    <span class="quote-ticker-text" id="quoteTickerText">…</span>
+    <span class="quote-ticker-author">— MC Isti</span>
+</div>
+
+<div class="prototype-banner" id="prototypeBanner">
+    ⚠️ Prototípus — az adatok most csak a saját böngésződben vannak (localStorage). Közös backend hozzákötve majd éles.
+    <button class="banner-dismiss" onclick="document.getElementById('prototypeBanner').style.display='none'" aria-label="Bezár">×</button>
+</div>
+
+<header class="hero">
+    <div class="hero-suits" aria-hidden="true">
+        <span>♠</span><span>♥</span><span>♣</span><span>♦</span>
+    </div>
+    <div class="hero-inner">
+        <div class="hero-badge">LEGÉNYBÚCSÚ</div>
+        <h1>Yilmaz Attila</h1>
+        <p class="hero-subtitle">búcsúzik az agglegényéletétől</p>
+
+        <div class="countdown" id="countdown" style="display:none;">
+            <div class="countdown-item"><span class="countdown-value" id="cdDays">—</span><span class="countdown-label">nap</span></div>
+            <div class="countdown-item"><span class="countdown-value" id="cdHours">—</span><span class="countdown-label">óra</span></div>
+            <div class="countdown-item"><span class="countdown-value" id="cdMinutes">—</span><span class="countdown-label">perc</span></div>
+            <div class="countdown-item"><span class="countdown-value" id="cdSeconds">—</span><span class="countdown-label">mp</span></div>
+        </div>
+
+        <div class="hero-meta">
+            <span id="dateLabel">📅 <strong>Dátum: TBD</strong></span>
+            <span class="dot">•</span>
+            <span id="placeLabel">📍 <strong>Helyszín: TBD</strong></span>
+            <span class="dot">•</span>
+            <span>👥 <strong>16 fő</strong></span>
+        </div>
+
+        <div class="mc-isti-gallery">
+            <img src="images/mc-isti-1.jpg" alt="MC Isti" class="mc-isti-photo" onerror="this.style.display='none'">
+            <div class="mc-isti-caption">💖 MC Isti • a legenda 💖</div>
+            <img src="images/mc-isti-2.jpg" alt="MC Isti" class="mc-isti-photo" onerror="this.style.display='none'">
+        </div>
+    </div>
+</header>
+
+<nav class="main-nav">
+    <a href="#dashboard">Áttekintés</a>
+    <a href="#reszvevok">Résztvevők</a>
+    <a href="#szallas">Szállás</a>
+    <a href="#menetrend">Menetrend</a>
+    <a href="#lejutas">Autók</a>
+    <a href="#szervezes">Szervezés</a>
+    <a href="#eszkozok">Eszközök</a>
+    <a href="#bevasarlas">Bevásárlás</a>
+    <a href="#meglepetes">🎁 Meglepetés</a>
+    <a href="#koltsegek">Kassza</a>
+    <a href="#elszamolas">Elszámolás</a>
+</nav>
+
+<main>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="card dashboard">
+    <h2>Áttekintés</h2>
+    <div class="stat-grid">
+        <div class="stat-item">
+            <div class="stat-icon">🚗</div>
+            <div class="stat-value"><span id="statCars">0</span> <span class="stat-sub">autó</span></div>
+            <div class="stat-label">indul</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value"><span id="statAssigned">0</span><span class="stat-sub">/15</span></div>
+            <div class="stat-label">autóba beírva</div>
+            <div class="progress-bar"><div class="progress-fill" id="assignedProgress"></div></div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">🛒</div>
+            <div class="stat-value"><span id="statShopItems">0</span></div>
+            <div class="stat-label">bevásárlási tétel</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value"><span id="statCostPerPerson">0</span> Ft</div>
+            <div class="stat-label">becsült / fő</div>
+        </div>
+    </div>
+    <div class="quick-actions">
+        <button class="btn btn-ghost btn-sm" id="btnShare">🔗 Link megosztása</button>
+        <button class="btn btn-ghost btn-sm" id="btnExport">📋 Összegzés másolása</button>
+    </div>
+</section>
+
+<!-- RÉSZTVEVŐK -->
+<section id="reszvevok" class="card">
+    <h2>Résztvevők</h2>
+    <ul class="participants" id="participantsList"></ul>
+    <p class="muted">Összesen: <strong>16 fő</strong> (⚠️ szállás 15-re van foglalva — Medárd beszorítva) • 👑 = ünnepelt</p>
+</section>
+
+<!-- SZÁLLÁS -->
+<section id="szallas" class="card">
+    <h2>Szállás</h2>
+    <p class="muted placeholder-note">Részletek hamarosan — leírás és képek hozzáadása várható.</p>
+
+    <div class="szallas-facts">
+        <div class="fact"><span class="fact-label">📅 Bejelentkezés</span><span class="fact-value">2026. május 22., péntek (14:00–22:00)</span></div>
+        <div class="fact"><span class="fact-label">📅 Kijelentkezés</span><span class="fact-value">2026. május 24., vasárnap (10:00-ig)</span></div>
+        <div class="fact"><span class="fact-label">🏠 Szállás</span><span class="fact-value">4 db Maisonette apartman</span></div>
+        <div class="fact"><span class="fact-label">👥 Létszám</span><span class="fact-value">15 felnőtt (foglalás) → <strong>16 érkezik</strong> (Medárd is jön)</span></div>
+        <div class="fact"><span class="fact-label">📍 Cím</span><span class="fact-value"><a href="https://maps.google.com/?q=3555+Hars%C3%A1ny%2C+D%C3%B3zsa+Gy%C3%B6rgy+u.+39." target="_blank" rel="noopener">3555 Harsány, Dózsa György u. 39.</a></span></div>
+        <div class="fact"><span class="fact-label">📞 Szállás kontakt</span><span class="fact-value"><a href="tel:+36202531324">+36 20 253 1324</a></span></div>
+        <div class="fact"><span class="fact-label">🍽️ Ellátás</span><span class="fact-value">Nincs — mindent magunk visszünk / főzünk</span></div>
+        <div class="fact"><span class="fact-label">💰 Teljes ár</span><span class="fact-value">€1 041 (4 apartman + IFA) → ~<strong>26 025 Ft/fő</strong> (16 főre osztva)</span></div>
+        <div class="fact"><span class="fact-label">⏳ Lemondás</span><span class="fact-value">Érkezés előtt 2 napig díjmentes (2026.05.19 23:59-ig)</span></div>
+    </div>
+
+    <h3>Galéria</h3>
+    <div class="gallery" id="szallasGaleria">
+        <div class="gallery-placeholder">Képek hamarosan — ha kész vannak, dobd őket az <code>images/</code> mappába.</div>
+    </div>
+
+    <h3>Hogyan lehet odajutni</h3>
+    <p>Harsány, Borsod-Abaúj-Zemplén megye, Bükk lábánál (kb. 15 km-re Miskolctól délre).</p>
+    <p>
+        <a class="btn btn-ghost btn-sm" href="https://maps.google.com/?q=3555+Hars%C3%A1ny%2C+D%C3%B3zsa+Gy%C3%B6rgy+u.+39." target="_blank" rel="noopener">🗺️ Megnyitás Google Mapsben</a>
+        <a class="btn btn-ghost btn-sm" href="https://waze.com/ul?q=3555%20Hars%C3%A1ny%2C%20D%C3%B3zsa%20Gy%C3%B6rgy%20u.%2039." target="_blank" rel="noopener">🚗 Waze</a>
+    </p>
+    <p class="muted">Részletesebb útirány (parkolás, fogadó személy stb.) hamarosan.</p>
+</section>
+
+<!-- MENETREND -->
+<section id="menetrend" class="card">
+    <h2>Menetrend <span class="pending-badge">PENDING</span></h2>
+    <p class="placeholder-note">⏳ Ez még sablon — véglegesítés folyamatban.</p>
+    <ol class="timeline" id="timelineList"></ol>
+</section>
+
+<!-- LEJUTÁS / AUTÓK -->
+<section id="lejutas" class="card">
+    <h2>Lejutás — autók</h2>
+    <p class="muted">Ki melyik autóval megy? Adj hozzá autót, és írd be magad vagy másokat.</p>
+
+    <div class="toolbar">
+        <button class="btn btn-primary" id="btnAddCar">+ Új autó</button>
+        <span class="stat">Még nincs autóban: <strong id="unassignedCount">15</strong> fő</span>
+    </div>
+
+    <div id="unassignedList" class="unassigned-list" style="display:none;"></div>
+
+    <div id="carsContainer" class="cars-grid"></div>
+
+    <div class="empty-state" id="carsEmpty" style="display:none;">
+        Még nincs autó. Nyomj a <strong>„+ Új autó"</strong> gombra, ha viszel vagy szervezel egyet.
+    </div>
+</section>
+
+<!-- SZERVEZÉS -->
+<section id="szervezes" class="card">
+    <h2>Szervezés</h2>
+
+    <div class="category">
+        <div class="category-header">
+            <h3>🍖 Kaja</h3>
+        </div>
+        <div class="role-row">
+            <span class="role-label">Felelős</span>
+            <span class="role-value">Jordán</span>
+        </div>
+        <div class="role-row">
+            <span class="role-label">Résztvevő</span>
+            <span class="role-value">Gábor</span>
+        </div>
+    </div>
+
+    <div class="category">
+        <div class="category-header">
+            <h3>🎲 Program</h3>
+        </div>
+        <div class="role-row">
+            <span class="role-label">Felelős</span>
+            <span class="role-value">Martin</span>
+        </div>
+        <div class="role-row">
+            <span class="role-label">Résztvevők</span>
+            <span class="role-value">Medárd, Máté</span>
+        </div>
+    </div>
+
+    <div class="category">
+        <div class="category-header">
+            <h3>🌃 Szálláson kívüli program</h3>
+        </div>
+        <div class="role-row">
+            <span class="role-label">Felelős</span>
+            <span class="role-value" id="kulsoFelelosLabel">— (szabad a jelentkezés)</span>
+        </div>
+        <div class="volunteer-row" id="kulsoVolunteerRow">
+            <select id="kulsoVolunteerSelect"></select>
+            <button class="btn btn-primary" id="btnKulsoVolunteer">Jelentkezem</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btnKulsoClear" style="display:none;">Lemondom</button>
+    </div>
+</section>
+
+<!-- ESZKÖZÖK -->
+<section id="eszkozok" class="card">
+    <h2>Eszközök</h2>
+    <p class="muted">Mit viszünk magunkkal? (JBL, poker chip-készlet, kártyapakli, grillfelszerelés, hosszabbító, stb.)</p>
+
+    <form class="eszkoz-form" id="eszkozForm">
+        <input type="text" id="eszkozName" placeholder="Mi? (pl. JBL hangszóró)" required>
+        <select id="eszkozBringer">
+            <option value="">Ki hozza? (opcionális)</option>
+        </select>
+        <input type="text" id="eszkozNote" placeholder="Megjegyzés (pl. töltővel)">
+        <button class="btn btn-primary" type="submit">+ Hozzáad</button>
+    </form>
+
+    <ul class="eszkoz-list" id="eszkozList"></ul>
+    <div class="empty-state" id="eszkozEmpty">Még nincs eszköz — tedd fel az elsőt.</div>
+</section>
+
+<!-- BEVÁSÁRLÁS -->
+<section id="bevasarlas" class="card">
+    <h2>Bevásárlás</h2>
+    <p class="muted">Csak olyan dolgok kerüljenek ide, ami <strong>KÖZÖS</strong> lesz.</p>
+
+    <form class="shopping-form" id="shoppingForm">
+        <input type="text" id="shopItem" placeholder="Mit veszünk?" required>
+        <input type="text" id="shopQty" placeholder="Mennyi?" required>
+        <input type="number" id="shopPrice" placeholder="Ár (Ft, összesen)" min="0" step="100">
+        <select id="shopBuyer">
+            <option value="">Ki veszi? (opcionális)</option>
+        </select>
+        <input type="text" id="shopNote" placeholder="Megjegyzés">
+        <button class="btn btn-primary" type="submit">+ Hozzáad</button>
+    </form>
+
+    <div class="shopping-wrapper">
+        <table class="shopping-table" id="shoppingTable">
+            <thead>
+                <tr>
+                    <th>Mit</th>
+                    <th>Mennyi</th>
+                    <th>Ár</th>
+                    <th>Ki veszi</th>
+                    <th>Megjegyzés</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="shoppingTbody"></tbody>
+            <tfoot id="shoppingTfoot"></tfoot>
+        </table>
+    </div>
+
+    <div class="empty-state" id="shoppingEmpty">Még nincs tétel a listán.</div>
+</section>
+
+<!-- MEGLEPETÉS / AJÁNDÉK -->
+<section id="meglepetes" class="card meglepetes-locked">
+    <h2>🎁 Meglepetés ajándék <span class="pending-badge" style="background:rgba(220,38,38,0.12);color:#dc2626;border-color:rgba(220,38,38,0.4);">SECRET</span></h2>
+    <p class="placeholder-note" style="color:#dc2626; background:rgba(220,38,38,0.08); border-color:rgba(220,38,38,0.3);">
+        ⚠️ <strong>Attila NE LÁSSA</strong> — ez a szekció alapból rejtett. Kattints a gombra a megnyitáshoz.
+    </p>
+
+    <div class="meglepetes-content" id="meglepetesContent">
+        <p class="muted">Ki mit hoz / mit vállal az ünnepelt meglepetésére, és ki mennyivel száll be a közös ajándékba.</p>
+
+        <form class="meglepetes-form" id="meglepetesForm">
+            <input type="text" id="meglepetesWhat" placeholder="Mi? (pl. gravírozott whisky üveg)" required>
+            <select id="meglepetesWho">
+                <option value="">Ki hozza / vállalja?</option>
+            </select>
+            <input type="number" id="meglepetesAmount" placeholder="Hozzájárulás (Ft)" min="0" step="500">
+            <input type="text" id="meglepetesNote" placeholder="Megjegyzés">
+            <button class="btn btn-primary" type="submit">+ Hozzáad</button>
+        </form>
+
+        <ul class="meglepetes-list" id="meglepetesList"></ul>
+        <div class="empty-state" id="meglepetesEmpty">Még semmi — tedd fel az első ötletet.</div>
+        <div class="meglepetes-total" id="meglepetesTotal"></div>
+    </div>
+
+    <button class="btn btn-ghost" id="btnMeglepetesLock">🔒 Bezárom</button>
+    <button class="btn btn-primary" id="btnMeglepetesUnlock">🔓 Megnyitom (Attila tényleg nincs itt?)</button>
+</section>
+
+<!-- KÖLTSÉGEK / KASSZA -->
+<section id="koltsegek" class="card">
+    <h2>Kassza</h2>
+    <p class="muted">Durva költségbecslés fejenként. Mentsd a saját értékeidet.</p>
+
+    <div class="cost-inputs">
+        <label class="cost-input">
+            <span class="cost-label">🏠 Szállás / fő</span>
+            <div class="cost-input-row">
+                <input type="number" id="costAccommodation" min="0" step="1000" placeholder="0">
+                <span>Ft</span>
+            </div>
+        </label>
+        <label class="cost-input">
+            <span class="cost-label">🍖 Kaja / fő (becslés)</span>
+            <div class="cost-input-row">
+                <input type="number" id="costFood" min="0" step="500" placeholder="0">
+                <span>Ft</span>
+            </div>
+        </label>
+        <label class="cost-input">
+            <span class="cost-label">♠️ Poker buy-in</span>
+            <div class="cost-input-row">
+                <input type="number" id="costPoker" min="0" step="500" placeholder="0">
+                <span>Ft</span>
+            </div>
+        </label>
+        <label class="cost-input">
+            <span class="cost-label">🎁 Ajándék kassza / fő</span>
+            <div class="cost-input-row">
+                <input type="number" id="costGift" min="0" step="500" placeholder="0">
+                <span>Ft</span>
+            </div>
+        </label>
+    </div>
+
+    <div class="cost-breakdown" id="costBreakdown">
+        <div class="cost-row"><span>Szállás</span><span id="cbAccommodation">0 Ft</span></div>
+        <div class="cost-row"><span>Kaja</span><span id="cbFood">0 Ft</span></div>
+        <div class="cost-row"><span>Poker buy-in</span><span id="cbPoker">0 Ft</span></div>
+        <div class="cost-row"><span>Ajándék kassza</span><span id="cbGift">0 Ft</span></div>
+        <div class="cost-row"><span>Közös bevásárlás / fő <span class="muted-inline">(16 főre elosztva)</span></span><span id="cbShopping">0 Ft</span></div>
+        <div class="cost-row cost-total"><span>Összesen / fő</span><span id="cbTotal">0 Ft</span></div>
+    </div>
+</section>
+
+<!-- ELSZÁMOLÁS -->
+<section id="elszamolas" class="card">
+    <h2>Elszámolás</h2>
+    <p class="muted">Mindenki írja be, mennyit fizetett ki (szállás, kaja, ital, üzemanyag stb.). A rendszer kiszámolja, ki van plusszban/mínuszban.</p>
+
+    <form class="payment-form" id="paymentForm">
+        <select id="payWho" required>
+            <option value="">— Ki fizette? —</option>
+        </select>
+        <input type="number" id="payAmount" placeholder="Összeg (Ft)" min="0" step="100" required>
+        <input type="text" id="payDesc" placeholder="Miért? (pl. szállás, tankolás, bolt)" required>
+        <button class="btn btn-primary" type="submit">+ Rögzít</button>
+    </form>
+
+    <div class="payment-summary" id="paymentSummary"></div>
+
+    <h3>Tételek</h3>
+    <ul class="payment-list" id="paymentList"></ul>
+    <div class="empty-state" id="paymentEmpty">Még nincs rögzített kifizetés.</div>
+</section>
+
+<!-- AKTIVITÁS -->
+<section id="aktivitas" class="card">
+    <h2>Legutóbbi aktivitás</h2>
+    <p class="muted">Csak a saját böngésződben — az utolsó 15 változás.</p>
+    <ul class="activity-list" id="activityList"></ul>
+    <div class="empty-state" id="activityEmpty">Még nincs aktivitás.</div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+    <p class="quote" id="pokerQuote">"…"</p>
+    <p>Poker Timer × Legénybúcsú • <a href="https://pokertimer.hu">pokertimer.hu</a></p>
+</footer>
+
+<button class="fab" id="scrollTopBtn" aria-label="Fel">↑</button>
+
+<!-- CAR MODAL -->
+<div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="carModal">
+        <h3 id="carModalTitle">Új autó</h3>
+        <form id="carForm">
+            <label>Sofőr
+                <select id="carDriver" required></select>
+            </label>
+            <label>Férőhely (sofőrrel együtt)
+                <input type="number" id="carSeats" min="2" max="9" value="5" required>
+            </label>
+            <label>Indulás helye
+                <input type="text" id="carFrom" placeholder="pl. Budapest, Deák tér">
+            </label>
+            <label>Indulási időpont
+                <input type="text" id="carDeparture" placeholder="pl. péntek 15:00">
+            </label>
+            <label>Megjegyzés
+                <input type="text" id="carNote" placeholder="pl. sörrel, hangosan">
+            </label>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" id="carCancel">Mégse</button>
+                <button type="submit" class="btn btn-primary">Mentés</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
