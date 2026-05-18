@@ -17,11 +17,6 @@
     <span class="quote-ticker-author">— MC Isti</span>
 </div>
 
-<div class="prototype-banner" id="prototypeBanner">
-    ⚠️ Prototípus — az adatok most csak a saját böngésződben vannak (localStorage). Közös backend hozzákötve majd éles.
-    <button class="banner-dismiss" onclick="document.getElementById('prototypeBanner').style.display='none'" aria-label="Bezár">×</button>
-</div>
-
 <header class="hero">
     <div class="hero-suits" aria-hidden="true">
         <span>♠</span><span>♥</span><span>♣</span><span>♦</span>
@@ -43,7 +38,7 @@
             <span class="dot">•</span>
             <span id="placeLabel">📍 <strong>Helyszín: TBD</strong></span>
             <span class="dot">•</span>
-            <span>👥 <strong>16 fő</strong></span>
+            <span>👥 <strong>15 fő</strong></span>
         </div>
 
         <div class="mc-isti-gallery">
@@ -61,6 +56,7 @@
     <a href="#menetrend">Menetrend</a>
     <a href="#lejutas">Autók</a>
     <a href="#szervezes">Szervezés</a>
+    <a href="#szavazas">Szavazás</a>
     <a href="#eszkozok">Eszközök</a>
     <a href="#bevasarlas">Bevásárlás</a>
     <a href="#meglepetes">🎁 Meglepetés</a>
@@ -97,6 +93,7 @@
         </div>
     </div>
     <div class="quick-actions">
+        <span class="sync-status" id="syncStatus" title="Közös szerver-szinkron állapota">…</span>
         <button class="btn btn-ghost btn-sm" id="btnShare">🔗 Link megosztása</button>
         <button class="btn btn-ghost btn-sm" id="btnExport">📋 Összegzés másolása</button>
     </div>
@@ -106,7 +103,7 @@
 <section id="reszvevok" class="card">
     <h2>Résztvevők</h2>
     <ul class="participants" id="participantsList"></ul>
-    <p class="muted">Összesen: <strong>16 fő</strong> (⚠️ szállás 15-re van foglalva — Medárd beszorítva) • 👑 = ünnepelt</p>
+    <p class="muted">Összesen: <strong>15 fő</strong> • 👑 = ünnepelt</p>
 </section>
 
 <!-- SZÁLLÁS -->
@@ -118,17 +115,12 @@
         <div class="fact"><span class="fact-label">📅 Bejelentkezés</span><span class="fact-value">2026. május 22., péntek (14:00–22:00)</span></div>
         <div class="fact"><span class="fact-label">📅 Kijelentkezés</span><span class="fact-value">2026. május 24., vasárnap (10:00-ig)</span></div>
         <div class="fact"><span class="fact-label">🏠 Szállás</span><span class="fact-value">4 db Maisonette apartman</span></div>
-        <div class="fact"><span class="fact-label">👥 Létszám</span><span class="fact-value">15 felnőtt (foglalás) → <strong>16 érkezik</strong> (Medárd is jön)</span></div>
+        <div class="fact"><span class="fact-label">👥 Létszám</span><span class="fact-value"><strong>15 fő</strong></span></div>
         <div class="fact"><span class="fact-label">📍 Cím</span><span class="fact-value"><a href="https://maps.google.com/?q=3555+Hars%C3%A1ny%2C+D%C3%B3zsa+Gy%C3%B6rgy+u.+39." target="_blank" rel="noopener">3555 Harsány, Dózsa György u. 39.</a></span></div>
         <div class="fact"><span class="fact-label">📞 Szállás kontakt</span><span class="fact-value"><a href="tel:+36202531324">+36 20 253 1324</a></span></div>
         <div class="fact"><span class="fact-label">🍽️ Ellátás</span><span class="fact-value">Nincs — mindent magunk visszünk / főzünk</span></div>
-        <div class="fact"><span class="fact-label">💰 Teljes ár</span><span class="fact-value">€1 041 (4 apartman + IFA) → ~<strong>26 025 Ft/fő</strong> (16 főre osztva)</span></div>
+        <div class="fact"><span class="fact-label">💰 Teljes ár</span><span class="fact-value">€1 041 (4 apartman + IFA) → ~<strong>27 760 Ft/fő</strong> (15 főre osztva)</span></div>
         <div class="fact"><span class="fact-label">⏳ Lemondás</span><span class="fact-value">Érkezés előtt 2 napig díjmentes (2026.05.19 23:59-ig)</span></div>
-    </div>
-
-    <h3>Galéria</h3>
-    <div class="gallery" id="szallasGaleria">
-        <div class="gallery-placeholder">Képek hamarosan — ha kész vannak, dobd őket az <code>images/</code> mappába.</div>
     </div>
 
     <h3>Hogyan lehet odajutni</h3>
@@ -194,13 +186,13 @@
         </div>
         <div class="role-row">
             <span class="role-label">Résztvevők</span>
-            <span class="role-value">Medárd, Máté</span>
+            <span class="role-value">Máté</span>
         </div>
     </div>
 
     <div class="category">
         <div class="category-header">
-            <h3>🌃 Szálláson kívüli program</h3>
+            <h3>🌃 Szálláson kívüli program szervezés</h3>
         </div>
         <div class="role-row">
             <span class="role-label">Felelős</span>
@@ -212,6 +204,49 @@
         </div>
         <button class="btn btn-ghost btn-sm" id="btnKulsoClear" style="display:none;">Lemondom</button>
     </div>
+
+    <div class="category">
+        <div class="category-header">
+            <h3>🏙️ Miskolci program szervezés</h3>
+        </div>
+        <p class="muted" style="margin:0 0 6px; font-size:0.85rem;">Kimozdulás Miskolcra — hely, időpont, eljutás.</p>
+        <div class="role-row">
+            <span class="role-label">Felelős</span>
+            <span class="role-value" id="miskolciFelelosLabel">— (szabad a jelentkezés)</span>
+        </div>
+        <div class="volunteer-row" id="miskolciVolunteerRow">
+            <select id="miskolciVolunteerSelect"></select>
+            <button class="btn btn-primary" id="btnMiskolciVolunteer">Jelentkezem</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btnMiskolciClear" style="display:none;">Lemondom</button>
+    </div>
+
+    <!-- Egyéni kategóriák -->
+    <div id="customCategoriesContainer"></div>
+
+    <!-- Új kategória hozzáadás -->
+    <div class="category category-add">
+        <div class="category-header">
+            <h3>➕ Új szervezési kategória</h3>
+        </div>
+        <form class="custom-cat-form" id="customCatForm">
+            <input type="text" id="ccIcon" placeholder="🎵" maxlength="2" class="cc-icon-input">
+            <input type="text" id="ccName" placeholder="Kategória neve (pl. Playlist DJ)" required>
+            <select id="ccFelelos">
+                <option value="">— Felelős (üres: szabad jelentkezés) —</option>
+            </select>
+            <input type="text" id="ccResztvevok" placeholder="Résztvevők (nevek vesszővel, opcionális)">
+            <input type="text" id="ccNote" placeholder="Megjegyzés (opcionális)">
+            <button class="btn btn-primary" type="submit">+ Hozzáad</button>
+        </form>
+    </div>
+</section>
+
+<!-- SZAVAZÁS -->
+<section id="szavazas" class="card">
+    <h2>Szavazás</h2>
+    <p class="muted">Közös döntések — mindenki adja le a voksát.</p>
+    <div id="pollsContainer" class="polls"></div>
 </section>
 
 <!-- ESZKÖZÖK -->
@@ -338,7 +373,7 @@
         <div class="cost-row"><span>Kaja</span><span id="cbFood">0 Ft</span></div>
         <div class="cost-row"><span>Poker buy-in</span><span id="cbPoker">0 Ft</span></div>
         <div class="cost-row"><span>Ajándék kassza</span><span id="cbGift">0 Ft</span></div>
-        <div class="cost-row"><span>Közös bevásárlás / fő <span class="muted-inline">(16 főre elosztva)</span></span><span id="cbShopping">0 Ft</span></div>
+        <div class="cost-row"><span>Közös bevásárlás / fő <span class="muted-inline">(15 főre elosztva)</span></span><span id="cbShopping">0 Ft</span></div>
         <div class="cost-row cost-total"><span>Összesen / fő</span><span id="cbTotal">0 Ft</span></div>
     </div>
 </section>

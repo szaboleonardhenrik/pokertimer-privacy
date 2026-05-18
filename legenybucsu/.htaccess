@@ -1,0 +1,18 @@
+# Védjük le a data.json direkt elérését — csak az api.php-n át olvasható
+<FilesMatch "\.(json|log|tmp)$">
+    Require all denied
+</FilesMatch>
+
+# Apache 2.2 fallback (ha kell)
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(json|log|tmp)$">
+        Order Allow,Deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Default charset
+AddDefaultCharset UTF-8
+
+# ETag ki, hogy a cache ne ragadjon be
+FileETag None

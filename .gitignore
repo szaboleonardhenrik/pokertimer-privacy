@@ -1,0 +1,3 @@
+# Éles, szerver-oldali közös állapot — soha ne kerüljön a repóba
+legenybucsu/data.json
+legenybucsu/.state_tmp_*
