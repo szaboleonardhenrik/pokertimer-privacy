@@ -56,6 +56,7 @@
     <a href="#menetrend">Menetrend</a>
     <a href="#lejutas">Autók</a>
     <a href="#eszkozok">Eszközök</a>
+    <a href="#pia">🍻 Pia</a>
     <a href="#bevasarlas">Bevásárlás</a>
     <a href="#meglepetes">🎁 Meglepetés</a>
     <a href="#koltsegek">Kassza</a>
@@ -173,6 +174,29 @@
     <div class="empty-state" id="eszkozEmpty">Még nincs eszköz — tedd fel az elsőt.</div>
 </section>
 
+<!-- PIA DISCLAIMER -->
+<section id="pia" class="card">
+    <h2>🍻 Pia — fontos!</h2>
+    <p class="placeholder-note">
+        🍷 Sokan sokféle piát innának, ezért <strong>a piát mindenki magának hozza!</strong>
+        Amit szeretsz inni (sör, tömény, bor, energiaital, amid van) — azt magadnak pakold be.
+        Így az elszámolás is sokkal egyszerűbb lesz 😎
+    </p>
+
+    <h3>Amit KÖZÖSEN dobunk össze</h3>
+    <div class="szallas-facts">
+        <div class="fact">
+            <span class="fact-label">🥃 Attilának</span>
+            <span class="fact-value"><strong>3 liter Jägermeister</strong> — az ünnepeltnek 🎉</span>
+        </div>
+        <div class="fact">
+            <span class="fact-label">🍷 Sorversenyhez</span>
+            <span class="fact-value"><strong>10–15 liter fehér bor</strong> (péntek 19:00, felelős: Radó)</span>
+        </div>
+    </div>
+    <p class="muted">Csak ez a kettő a közös kasszából — minden más egyéni.</p>
+</section>
+
 <!-- BEVÁSÁRLÁS -->
 <section id="bevasarlas" class="card">
     <h2>Bevásárlás</h2>
@@ -266,6 +290,13 @@
             </div>
         </label>
         <label class="cost-input">
+            <span class="cost-label">👕 Közös póló / fő <span class="muted-inline">(Máté rendelte, grafika nélkül • nettó, ÁFA nélkül)</span></span>
+            <div class="cost-input-row">
+                <input type="number" id="costTshirt" min="0" step="50" placeholder="950">
+                <span>Ft</span>
+            </div>
+        </label>
+        <label class="cost-input">
             <span class="cost-label">🎁 Ajándék kassza / fő</span>
             <div class="cost-input-row">
                 <input type="number" id="costGift" min="0" step="500" placeholder="0">
@@ -278,6 +309,7 @@
         <div class="cost-row"><span>Szállás</span><span id="cbAccommodation">0 Ft</span></div>
         <div class="cost-row"><span>Kaja</span><span id="cbFood">0 Ft</span></div>
         <div class="cost-row"><span>Pogány induló koncert (VIP jegy)</span><span id="cbConcert">0 Ft</span></div>
+        <div class="cost-row"><span>Közös póló <span class="muted-inline">(ÁFA nélkül)</span></span><span id="cbTshirt">0 Ft</span></div>
         <div class="cost-row"><span>Ajándék kassza</span><span id="cbGift">0 Ft</span></div>
         <div class="cost-row"><span>Közös bevásárlás / fő <span class="muted-inline">(15 főre elosztva)</span></span><span id="cbShopping">0 Ft</span></div>
         <div class="cost-row cost-total"><span>Összesen / fő</span><span id="cbTotal">0 Ft</span></div>

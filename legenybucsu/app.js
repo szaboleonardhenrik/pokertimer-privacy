@@ -109,6 +109,9 @@ function migrateState(s) {
         if (s.costs.concert === undefined || s.costs.concert === null) {
             s.costs.concert = 10000;
         }
+        if (s.costs.tshirt === undefined || s.costs.tshirt === null) {
+            s.costs.tshirt = 950;
+        }
         delete s.costs.poker;
     }
     return s;
@@ -127,7 +130,7 @@ function defaultState() {
         payments: [],
         // Szállás: €1 041 / 15 fő ≈ 27 760 Ft (400 HUF/EUR árfolyamon). A felhasználó felülírhatja.
         // Koncert: Pogány induló — VIP jegy 10 000 Ft / fő.
-        costs: { accommodation: 27760, food: 0, concert: 10000, gift: 0 },
+        costs: { accommodation: 27760, food: 0, concert: 10000, tshirt: 950, gift: 0 },
     };
 }
 
@@ -838,7 +841,7 @@ function calcShoppingPerPerson() {
 
 function calcTotalPerPerson() {
     const c = state.costs;
-    return (c.accommodation || 0) + (c.food || 0) + (c.concert || 0) + (c.gift || 0) + calcShoppingPerPerson();
+    return (c.accommodation || 0) + (c.food || 0) + (c.concert || 0) + (c.tshirt || 0) + (c.gift || 0) + calcShoppingPerPerson();
 }
 
 function renderCosts() {
@@ -846,11 +849,13 @@ function renderCosts() {
     $('#costAccommodation').value = c.accommodation || '';
     $('#costFood').value = c.food || '';
     $('#costConcert').value = c.concert || '';
+    $('#costTshirt').value = c.tshirt || '';
     $('#costGift').value = c.gift || '';
 
     $('#cbAccommodation').textContent = fmtFt(c.accommodation);
     $('#cbFood').textContent = fmtFt(c.food);
     $('#cbConcert').textContent = fmtFt(c.concert);
+    $('#cbTshirt').textContent = fmtFt(c.tshirt);
     $('#cbGift').textContent = fmtFt(c.gift);
     $('#cbShopping').textContent = fmtFt(calcShoppingPerPerson());
     $('#cbTotal').textContent = fmtFt(calcTotalPerPerson());
@@ -861,6 +866,7 @@ function bindCostInputs() {
         costAccommodation: 'accommodation',
         costFood: 'food',
         costConcert: 'concert',
+        costTshirt: 'tshirt',
         costGift: 'gift',
     };
     for (const [id, key] of Object.entries(map)) {
