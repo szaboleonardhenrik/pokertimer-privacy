@@ -33,7 +33,7 @@ const SCHEDULE = [
     { time: 'Péntek — 19:00', title: 'Sorverseny', icon: '🍺', note: 'Felelős: Radó' },
     { time: 'Péntek este', title: 'Vacsora', icon: '🍖', note: 'Felelős: Jordán + Gábor' },
     { time: 'Péntek este', title: 'Anna-ismereti quiz', icon: '❓', note: 'Mennyire ismered a menyasszonyt?' },
-    { time: 'Szombat (máj. 23) reggel', title: 'Reggeli — bundáskenyér', icon: '☕', note: 'Felelős: Leonárd' },
+    { time: 'Szombat (máj. 23) reggel', title: 'Reggeli — bundáskenyér', icon: '☕', note: 'Felelős: — (még nincs)' },
     { time: 'Szombat — 13:00', title: 'Paintball', icon: '🎯' },
     { time: 'Szombat — 22:00', title: 'Kis Tetü koncert', icon: '🎸' },
     { time: 'Vasárnap (máj. 24) reggel', title: 'Reggeli — bundáskenyér, majd kijelentkezés', icon: '🚗', note: 'Check-out 10:00-ig' },
