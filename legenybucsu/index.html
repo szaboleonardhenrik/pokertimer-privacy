@@ -55,8 +55,6 @@
     <a href="#szallas">Szállás</a>
     <a href="#menetrend">Menetrend</a>
     <a href="#lejutas">Autók</a>
-    <a href="#szervezes">Szervezés</a>
-    <a href="#szavazas">Szavazás</a>
     <a href="#eszkozok">Eszközök</a>
     <a href="#bevasarlas">Bevásárlás</a>
     <a href="#meglepetes">🎁 Meglepetés</a>
@@ -134,8 +132,7 @@
 
 <!-- MENETREND -->
 <section id="menetrend" class="card">
-    <h2>Menetrend <span class="pending-badge">PENDING</span></h2>
-    <p class="placeholder-note">⏳ Ez még sablon — véglegesítés folyamatban.</p>
+    <h2>Menetrend</h2>
     <ol class="timeline" id="timelineList"></ol>
 </section>
 
@@ -156,97 +153,6 @@
     <div class="empty-state" id="carsEmpty" style="display:none;">
         Még nincs autó. Nyomj a <strong>„+ Új autó"</strong> gombra, ha viszel vagy szervezel egyet.
     </div>
-</section>
-
-<!-- SZERVEZÉS -->
-<section id="szervezes" class="card">
-    <h2>Szervezés</h2>
-
-    <div class="category">
-        <div class="category-header">
-            <h3>🍖 Kaja</h3>
-        </div>
-        <div class="role-row">
-            <span class="role-label">Felelős</span>
-            <span class="role-value">Jordán</span>
-        </div>
-        <div class="role-row">
-            <span class="role-label">Résztvevő</span>
-            <span class="role-value">Gábor</span>
-        </div>
-    </div>
-
-    <div class="category">
-        <div class="category-header">
-            <h3>🎲 Program</h3>
-        </div>
-        <div class="role-row">
-            <span class="role-label">Felelős</span>
-            <span class="role-value">Martin</span>
-        </div>
-        <div class="role-row">
-            <span class="role-label">Résztvevők</span>
-            <span class="role-value">Máté</span>
-        </div>
-    </div>
-
-    <div class="category">
-        <div class="category-header">
-            <h3>🌃 Szálláson kívüli program szervezés</h3>
-        </div>
-        <div class="role-row">
-            <span class="role-label">Felelős</span>
-            <span class="role-value" id="kulsoFelelosLabel">— (szabad a jelentkezés)</span>
-        </div>
-        <div class="volunteer-row" id="kulsoVolunteerRow">
-            <select id="kulsoVolunteerSelect"></select>
-            <button class="btn btn-primary" id="btnKulsoVolunteer">Jelentkezem</button>
-        </div>
-        <button class="btn btn-ghost btn-sm" id="btnKulsoClear" style="display:none;">Lemondom</button>
-    </div>
-
-    <div class="category">
-        <div class="category-header">
-            <h3>🏙️ Miskolci program szervezés</h3>
-        </div>
-        <p class="muted" style="margin:0 0 6px; font-size:0.85rem;">Kimozdulás Miskolcra — hely, időpont, eljutás.</p>
-        <div class="role-row">
-            <span class="role-label">Felelős</span>
-            <span class="role-value" id="miskolciFelelosLabel">— (szabad a jelentkezés)</span>
-        </div>
-        <div class="volunteer-row" id="miskolciVolunteerRow">
-            <select id="miskolciVolunteerSelect"></select>
-            <button class="btn btn-primary" id="btnMiskolciVolunteer">Jelentkezem</button>
-        </div>
-        <button class="btn btn-ghost btn-sm" id="btnMiskolciClear" style="display:none;">Lemondom</button>
-    </div>
-
-    <!-- Egyéni kategóriák -->
-    <div id="customCategoriesContainer"></div>
-
-    <!-- Új kategória hozzáadás -->
-    <div class="category category-add">
-        <div class="category-header">
-            <h3>➕ Új szervezési kategória</h3>
-        </div>
-        <form class="custom-cat-form" id="customCatForm">
-            <input type="text" id="ccIcon" placeholder="🎵" maxlength="2" class="cc-icon-input">
-            <input type="text" id="ccName" placeholder="Kategória neve (pl. Playlist DJ)" required>
-            <select id="ccFelelos">
-                <option value="">— Felelős (üres: szabad jelentkezés) —</option>
-            </select>
-            <input type="text" id="ccResztvevok" placeholder="Résztvevők (nevek vesszővel, opcionális)">
-            <input type="text" id="ccNote" placeholder="Megjegyzés (opcionális)">
-            <button class="btn btn-primary" type="submit">+ Hozzáad</button>
-        </form>
-    </div>
-</section>
-
-<!-- SZAVAZÁS -->
-<section id="szavazas" class="card">
-    <h2>Szavazás</h2>
-    <p class="muted">Közös döntések — mindenki adja le a voksát.</p>
-    <div id="pollsContainer" class="polls"></div>
 </section>
 
 <!-- ESZKÖZÖK -->
@@ -353,9 +259,9 @@
             </div>
         </label>
         <label class="cost-input">
-            <span class="cost-label">♠️ Poker buy-in</span>
+            <span class="cost-label">🎤 Pogány induló koncert — VIP jegy / fő</span>
             <div class="cost-input-row">
-                <input type="number" id="costPoker" min="0" step="500" placeholder="0">
+                <input type="number" id="costConcert" min="0" step="500" placeholder="10000">
                 <span>Ft</span>
             </div>
         </label>
@@ -371,7 +277,7 @@
     <div class="cost-breakdown" id="costBreakdown">
         <div class="cost-row"><span>Szállás</span><span id="cbAccommodation">0 Ft</span></div>
         <div class="cost-row"><span>Kaja</span><span id="cbFood">0 Ft</span></div>
-        <div class="cost-row"><span>Poker buy-in</span><span id="cbPoker">0 Ft</span></div>
+        <div class="cost-row"><span>Pogány induló koncert (VIP jegy)</span><span id="cbConcert">0 Ft</span></div>
         <div class="cost-row"><span>Ajándék kassza</span><span id="cbGift">0 Ft</span></div>
         <div class="cost-row"><span>Közös bevásárlás / fő <span class="muted-inline">(15 főre elosztva)</span></span><span id="cbShopping">0 Ft</span></div>
         <div class="cost-row cost-total"><span>Összesen / fő</span><span id="cbTotal">0 Ft</span></div>

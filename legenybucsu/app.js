@@ -29,14 +29,14 @@ const PARTICIPANTS = [
 
 // Menetrend (szerkeszthető)
 const SCHEDULE = [
-    { time: 'Péntek (máj. 22) — 14:00-tól', title: 'Bejelentkezés, érkezés', icon: '🎒', note: 'Becsekkolás 14:00–22:00 között • szoba-elosztás' },
-    { time: 'Péntek este', title: 'Vacsora', icon: '🍖', note: 'Jordán (felelős) + Gábor' },
-    { time: 'Péntek — 19:00', title: 'Fröccsváltó', icon: '🍷', note: 'Radó szervezésében' },
-    { time: 'Péntek éjszaka', title: 'Szálláson kívüli program', icon: '🌃', note: 'Felelős: még keresve' },
-    { time: 'Szombat reggel', title: 'Reggeli — bundáskenyér', icon: '☕', note: 'Domi + Leonárd' },
-    { time: 'Szombat délelőtt', title: 'Szabadprogram', icon: '🎯' },
-    { time: 'Szombat este', title: 'Ünnepi vacsora + buli', icon: '🎉' },
-    { time: 'Vasárnap (máj. 24) — 10:00-ig', title: 'Kijelentkezés, hazaindulás', icon: '🚗' },
+    { time: 'Péntek (máj. 22) — 14:00–18:00', title: 'Érkezés, bejelentkezés', icon: '🎒', note: 'Becsekkolás 14:00–18:00 között • szoba-elosztás' },
+    { time: 'Péntek — 19:00', title: 'Sorverseny', icon: '🍺', note: 'Felelős: Radó' },
+    { time: 'Péntek este', title: 'Vacsora', icon: '🍖', note: 'Felelős: Jordán + Gábor' },
+    { time: 'Péntek este', title: 'Anna-ismereti quiz', icon: '❓', note: 'Mennyire ismered a menyasszonyt?' },
+    { time: 'Szombat (máj. 23) reggel', title: 'Reggeli — bundáskenyér', icon: '☕', note: 'Felelős: Leonárd' },
+    { time: 'Szombat — 13:00', title: 'Paintball', icon: '🎯' },
+    { time: 'Szombat — 22:00', title: 'Kis Tetü koncert', icon: '🎸' },
+    { time: 'Vasárnap (máj. 24) reggel', title: 'Reggeli — bundáskenyér, majd kijelentkezés', icon: '🚗', note: 'Check-out 10:00-ig' },
 ];
 
 // Poker idézetek a láblécben
@@ -87,8 +87,6 @@ function loadState() {
         if (!raw) return defaultState();
         const def = defaultState();
         const parsed = JSON.parse(raw);
-        // Ha korábbi állapotnak még nincs polls mezője, adjuk hozzá a seedelt szavazást
-        if (parsed.polls === undefined) parsed.polls = def.polls;
         return { ...def, ...parsed };
     } catch {
         return defaultState();
@@ -106,20 +104,9 @@ function defaultState() {
         eszkozok: [],
         meglepetesek: [],
         payments: [],
-        polls: [
-            {
-                id: 'poll-tancos',
-                question: 'Legyen exkluzív táncoslány? 💃',
-                proposedBy: 'Gábor',
-                options: ['Igen 🔥', 'Nem 🙅', 'Talán 🤔'],
-                votes: {},
-            },
-        ],
-        kulsoFelelos: null,
-        miskolciFelelos: null,
-        customCategories: [],
         // Szállás: €1 041 / 15 fő ≈ 27 760 Ft (400 HUF/EUR árfolyamon). A felhasználó felülírhatja.
-        costs: { accommodation: 27760, food: 0, poker: 0, gift: 0 },
+        // Koncert: Pogány induló — VIP jegy 10 000 Ft / fő.
+        costs: { accommodation: 27760, food: 0, concert: 10000, gift: 0 },
     };
 }
 
@@ -462,7 +449,6 @@ window.deleteCar = function(carId) {
     logActivity(`${car.driver} autója törölve`);
     renderCars();
     rebuildShopBuyerSelect();
-    rebuildKulsoSelect();
 };
 
 function openCarModal() {
@@ -569,231 +555,6 @@ function onShoppingSubmit(e) {
     renderShopping();
     $('#shoppingForm').reset();
     toast(`„${item.item}" hozzáadva ✓`);
-}
-
-// ============================================================================
-// SZAVAZÁS
-// ============================================================================
-const VOTER_KEY = 'legenybucsu_current_voter_v1';
-function getCurrentVoter() { return sessionStorage.getItem(VOTER_KEY) || ''; }
-function setCurrentVoter(name) {
-    if (name) sessionStorage.setItem(VOTER_KEY, name);
-    else sessionStorage.removeItem(VOTER_KEY);
-}
-
-function renderPolls() {
-    const container = $('#pollsContainer');
-    if (!container) return;
-    if (!state.polls.length) {
-        container.innerHTML = '<div class="empty-state">Nincs aktív szavazás.</div>';
-        return;
-    }
-    const currentVoter = getCurrentVoter();
-    container.innerHTML = state.polls.map(poll => renderPoll(poll, currentVoter)).join('');
-
-    // wire events
-    container.querySelectorAll('.poll-voter-select').forEach(sel => {
-        sel.addEventListener('change', e => {
-            setCurrentVoter(e.target.value);
-            renderPolls();
-        });
-    });
-    container.querySelectorAll('.poll-option-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-            const pollId = btn.dataset.pollId;
-            const option = btn.dataset.option;
-            castVote(pollId, option);
-        });
-    });
-}
-
-function renderPoll(poll, currentVoter) {
-    const myVote = currentVoter ? poll.votes[currentVoter] : null;
-    const voterOptions = '<option value="">— ki vagy? —</option>' +
-        PARTICIPANTS.map(p => `<option value="${escapeHtml(p.name)}" ${p.name === currentVoter ? 'selected' : ''}>${escapeHtml(p.name)}</option>`).join('');
-
-    // tally
-    const tally = {};
-    for (const opt of poll.options) tally[opt] = [];
-    for (const [voter, choice] of Object.entries(poll.votes)) {
-        if (tally[choice]) tally[choice].push(voter);
-    }
-    const totalVotes = Object.values(tally).reduce((s, v) => s + v.length, 0);
-
-    const optionsHtml = poll.options.map(opt => {
-        const count = tally[opt].length;
-        const pct = totalVotes > 0 ? Math.round(count / totalVotes * 100) : 0;
-        const isMy = myVote === opt;
-        const voters = tally[opt];
-        return `
-            <div class="poll-option-row">
-                <button class="poll-option-btn ${isMy ? 'my-vote' : ''} ${currentVoter ? '' : 'disabled'}"
-                        data-poll-id="${escapeHtml(poll.id)}"
-                        data-option="${escapeHtml(opt)}"
-                        ${currentVoter ? '' : 'disabled'}
-                        title="${currentVoter ? 'Szavazz erre' : 'Előbb válaszd ki ki vagy'}">
-                    <span class="poll-option-label">${escapeHtml(opt)}${isMy ? ' ✓' : ''}</span>
-                    <span class="poll-option-bar"><span class="poll-option-bar-fill" style="width:${pct}%"></span></span>
-                    <span class="poll-option-count">${count}</span>
-                </button>
-                ${voters.length ? `<div class="poll-voter-list">${voters.map(v => `<span class="poll-voter-chip">${escapeHtml(v)}</span>`).join('')}</div>` : ''}
-            </div>
-        `;
-    }).join('');
-
-    return `
-        <div class="poll">
-            <div class="poll-question">🗳️ ${escapeHtml(poll.question)}</div>
-            <div class="poll-proposer">${escapeHtml(poll.proposedBy)} ötlete • ${totalVotes} / ${PARTICIPANTS.length} szavazat</div>
-            <div class="poll-vote-widget">
-                <select class="poll-voter-select" aria-label="Válaszd ki, ki vagy">${voterOptions}</select>
-                <span class="muted" style="font-size:0.85rem;">${currentVoter ? 'szavazhatsz alább 👇' : '← előbb válaszd ki ki vagy'}</span>
-            </div>
-            <div class="poll-options">${optionsHtml}</div>
-        </div>
-    `;
-}
-
-function castVote(pollId, option) {
-    const voter = getCurrentVoter();
-    if (!voter) { toast('Előbb válaszd ki, ki vagy'); return; }
-    const poll = state.polls.find(p => p.id === pollId);
-    if (!poll) return;
-    const prev = poll.votes[voter];
-    if (prev === option) {
-        // unvote
-        delete poll.votes[voter];
-        saveState();
-        logActivity(`${voter} visszavonta a szavazatát: ${poll.question}`);
-        toast('Szavazat visszavonva');
-    } else {
-        poll.votes[voter] = option;
-        saveState();
-        logActivity(`${voter} szavazott: "${option}" — ${poll.question}`);
-        toast(`Szavaztál: ${option}`);
-    }
-    renderPolls();
-}
-
-// ============================================================================
-// EGYÉNI SZERVEZÉSI KATEGÓRIÁK
-// ============================================================================
-function renderCustomCategories() {
-    const container = $('#customCategoriesContainer');
-    if (!container) return;
-    if (!state.customCategories || !state.customCategories.length) {
-        container.innerHTML = '';
-        return;
-    }
-    container.innerHTML = state.customCategories.map(cat => renderCustomCategory(cat)).join('');
-}
-
-function renderCustomCategory(cat) {
-    const hasFelelos = !!cat.felelos;
-    const resztvevokList = (cat.resztvevok || []).filter(Boolean);
-    const icon = cat.icon || '📌';
-
-    const voterOptions = PARTICIPANTS
-        .map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('');
-
-    return `
-        <div class="category custom-category" data-cat-id="${escapeHtml(cat.id)}">
-            <div class="category-header">
-                <h3>${escapeHtml(icon)} ${escapeHtml(cat.name)}</h3>
-                <button class="btn btn-ghost btn-sm cc-delete" data-cat-id="${escapeHtml(cat.id)}" title="Kategória törlése" aria-label="Törlés">×</button>
-            </div>
-            <div class="role-row">
-                <span class="role-label">Felelős</span>
-                <span class="role-value" style="${hasFelelos ? 'color:var(--gold);font-weight:600;' : 'color:var(--text-muted);'}">
-                    ${hasFelelos ? escapeHtml(cat.felelos) : '— (szabad a jelentkezés)'}
-                </span>
-            </div>
-            ${resztvevokList.length ? `
-                <div class="role-row">
-                    <span class="role-label">Résztvevők</span>
-                    <span class="role-value">${resztvevokList.map(escapeHtml).join(', ')}</span>
-                </div>
-            ` : ''}
-            ${cat.note ? `<p class="muted" style="margin:6px 0 0; font-size:0.85rem;">${escapeHtml(cat.note)}</p>` : ''}
-            ${hasFelelos ? `
-                <button class="btn btn-ghost btn-sm cc-clear" data-cat-id="${escapeHtml(cat.id)}" style="margin-top:10px;">Lemondom</button>
-            ` : `
-                <div class="volunteer-row" style="margin-top:10px;">
-                    <select class="cc-volunteer-select" data-cat-id="${escapeHtml(cat.id)}">
-                        <option value="">— Válassz nevet —</option>
-                        ${voterOptions}
-                    </select>
-                    <button class="btn btn-primary cc-volunteer" data-cat-id="${escapeHtml(cat.id)}">Jelentkezem</button>
-                </div>
-            `}
-        </div>
-    `;
-}
-
-function rebuildCustomCatFelelosSelect() {
-    const sel = $('#ccFelelos');
-    if (!sel) return;
-    sel.innerHTML = '<option value="">— Felelős (üres: szabad jelentkezés) —</option>' +
-        PARTICIPANTS.map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('');
-}
-
-function onCustomCatSubmit(e) {
-    e.preventDefault();
-    const name = $('#ccName').value.trim();
-    if (!name) return;
-    const resztvevokStr = $('#ccResztvevok').value.trim();
-    const resztvevok = resztvevokStr
-        ? resztvevokStr.split(',').map(s => s.trim()).filter(Boolean)
-        : [];
-    const cat = {
-        id: uid(),
-        name,
-        icon: $('#ccIcon').value.trim() || '📌',
-        felelos: $('#ccFelelos').value || null,
-        resztvevok,
-        note: $('#ccNote').value.trim(),
-    };
-    state.customCategories.push(cat);
-    saveState();
-    logActivity(`Új kategória: ${cat.icon} ${cat.name}${cat.felelos ? ' — ' + cat.felelos : ''}`);
-    renderCustomCategories();
-    $('#customCatForm').reset();
-    toast(`„${cat.name}" hozzáadva ✓`);
-}
-
-function bindCustomCategoriesEvents() {
-    const container = $('#customCategoriesContainer');
-    if (!container) return;
-    container.addEventListener('click', e => {
-        const catId = e.target.dataset.catId;
-        if (!catId) return;
-        const cat = state.customCategories.find(c => c.id === catId);
-        if (!cat) return;
-
-        if (e.target.classList.contains('cc-delete')) {
-            if (!confirm(`Biztos törlöd? (${cat.name})`)) return;
-            state.customCategories = state.customCategories.filter(c => c.id !== catId);
-            saveState();
-            logActivity(`Kategória törölve: ${cat.name}`);
-            renderCustomCategories();
-        } else if (e.target.classList.contains('cc-clear')) {
-            if (!confirm(`Biztos lemondod? (${cat.felelos} — ${cat.name})`)) return;
-            const was = cat.felelos;
-            cat.felelos = null;
-            saveState();
-            logActivity(`${was} lemondta: ${cat.name}`);
-            renderCustomCategories();
-        } else if (e.target.classList.contains('cc-volunteer')) {
-            const sel = container.querySelector(`.cc-volunteer-select[data-cat-id="${catId}"]`);
-            const name = sel ? sel.value : '';
-            if (!name) { toast('Válassz nevet a listából'); return; }
-            cat.felelos = name;
-            saveState();
-            logActivity(`${name} bevállalta: ${cat.name}`);
-            renderCustomCategories();
-            toast(`${name} bevállalta ✓`);
-        }
-    });
 }
 
 // ============================================================================
@@ -1047,50 +808,6 @@ function onPaymentSubmit(e) {
 }
 
 // ============================================================================
-// SZÁLLÁSON KÍVÜLI PROGRAM — JELENTKEZÉS
-// ============================================================================
-function rebuildKulsoSelect() {
-    const opts = '<option value="">— Válassz nevet —</option>' +
-        PARTICIPANTS.map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('');
-    $('#kulsoVolunteerSelect').innerHTML = opts;
-    $('#miskolciVolunteerSelect').innerHTML = opts;
-}
-
-function renderKulso() {
-    renderVolunteerRole({
-        who: state.kulsoFelelos,
-        labelId: 'kulsoFelelosLabel',
-        rowId: 'kulsoVolunteerRow',
-        clearBtnId: 'btnKulsoClear',
-    });
-    renderVolunteerRole({
-        who: state.miskolciFelelos,
-        labelId: 'miskolciFelelosLabel',
-        rowId: 'miskolciVolunteerRow',
-        clearBtnId: 'btnMiskolciClear',
-    });
-}
-
-function renderVolunteerRole({ who, labelId, rowId, clearBtnId }) {
-    const label = document.getElementById(labelId);
-    const row = document.getElementById(rowId);
-    const clearBtn = document.getElementById(clearBtnId);
-    if (!label) return;
-
-    if (who) {
-        label.textContent = who;
-        label.style.color = 'var(--gold)';
-        if (row) row.style.display = 'none';
-        if (clearBtn) clearBtn.style.display = 'inline-block';
-    } else {
-        label.textContent = '— (szabad a jelentkezés)';
-        label.style.color = 'var(--text-muted)';
-        if (row) row.style.display = 'flex';
-        if (clearBtn) clearBtn.style.display = 'none';
-    }
-}
-
-// ============================================================================
 // KÖLTSÉGEK
 // ============================================================================
 function calcShoppingPerPerson() {
@@ -1100,19 +817,19 @@ function calcShoppingPerPerson() {
 
 function calcTotalPerPerson() {
     const c = state.costs;
-    return (c.accommodation || 0) + (c.food || 0) + (c.poker || 0) + (c.gift || 0) + calcShoppingPerPerson();
+    return (c.accommodation || 0) + (c.food || 0) + (c.concert || 0) + (c.gift || 0) + calcShoppingPerPerson();
 }
 
 function renderCosts() {
     const c = state.costs;
     $('#costAccommodation').value = c.accommodation || '';
     $('#costFood').value = c.food || '';
-    $('#costPoker').value = c.poker || '';
+    $('#costConcert').value = c.concert || '';
     $('#costGift').value = c.gift || '';
 
     $('#cbAccommodation').textContent = fmtFt(c.accommodation);
     $('#cbFood').textContent = fmtFt(c.food);
-    $('#cbPoker').textContent = fmtFt(c.poker);
+    $('#cbConcert').textContent = fmtFt(c.concert);
     $('#cbGift').textContent = fmtFt(c.gift);
     $('#cbShopping').textContent = fmtFt(calcShoppingPerPerson());
     $('#cbTotal').textContent = fmtFt(calcTotalPerPerson());
@@ -1122,7 +839,7 @@ function bindCostInputs() {
     const map = {
         costAccommodation: 'accommodation',
         costFood: 'food',
-        costPoker: 'poker',
+        costConcert: 'concert',
         costGift: 'gift',
     };
     for (const [id, key] of Object.entries(map)) {
@@ -1195,8 +912,6 @@ function exportSummary() {
     lines.push('BEVÁSÁRLÁS:');
     if (state.shopping.length === 0) lines.push('  (üres)');
     else state.shopping.forEach(s => lines.push(`  • ${s.item} — ${s.qty}${s.price ? ' (' + fmtFt(s.price) + ')' : ''}${s.buyer ? ' — veszi: ' + s.buyer : ''}`));
-    lines.push('');
-    lines.push(`SZÁLLÁSON KÍVÜLI PROGRAM FELELŐS: ${state.kulsoFelelos || '— (üres)'}`);
     lines.push('');
     lines.push(`KÖLTSÉG / FŐ: ${fmtFt(calcTotalPerPerson())}`);
 
@@ -1271,16 +986,12 @@ function renderAll() {
     renderCars();
     renderShopping();
     renderEszkozok();
-    renderCustomCategories();
-    renderPolls();
     renderMeglepetes();
     renderPayments();
     rebuildShopBuyerSelect();
     rebuildEszkozBringerSelect();
     rebuildMeglepetesSelect();
     rebuildPaymentSelect();
-    rebuildKulsoSelect();
-    renderKulso();
     renderCosts();
     renderActivity();
     renderDashboard();
@@ -1311,11 +1022,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     $('#shoppingForm').addEventListener('submit', onShoppingSubmit);
     $('#eszkozForm').addEventListener('submit', onEszkozSubmit);
-    $('#customCatForm').addEventListener('submit', onCustomCatSubmit);
     $('#meglepetesForm').addEventListener('submit', onMeglepetesSubmit);
     $('#paymentForm').addEventListener('submit', onPaymentSubmit);
-    bindCustomCategoriesEvents();
-    rebuildCustomCatFelelosSelect();
 
     $('#btnMeglepetesUnlock').addEventListener('click', () => {
         if (!confirm('Tényleg nincs most itt Attila a válladnál? 👀\n\nHa megnyitod, ő is láthatja ha nézi a telefonodat.')) return;
@@ -1325,44 +1033,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     $('#btnMeglepetesLock').addEventListener('click', () => {
         setMeglepetesUnlocked(false);
         toast('Meglepetés szekció bezárva 🔒');
-    });
-
-    $('#btnKulsoVolunteer').addEventListener('click', () => {
-        const name = $('#kulsoVolunteerSelect').value;
-        if (!name) { toast('Válassz nevet a listából'); return; }
-        state.kulsoFelelos = name;
-        saveState();
-        logActivity(`${name} bevállalta a szálláson kívüli program szervezést`);
-        renderKulso();
-        toast(`${name} bevállalta ✓`);
-    });
-
-    $('#btnKulsoClear').addEventListener('click', () => {
-        if (!confirm(`Biztos lemondod a szerepet? (${state.kulsoFelelos})`)) return;
-        const was = state.kulsoFelelos;
-        state.kulsoFelelos = null;
-        saveState();
-        logActivity(`${was} lemondta a szálláson kívüli program szervezést`);
-        renderKulso();
-    });
-
-    $('#btnMiskolciVolunteer').addEventListener('click', () => {
-        const name = $('#miskolciVolunteerSelect').value;
-        if (!name) { toast('Válassz nevet a listából'); return; }
-        state.miskolciFelelos = name;
-        saveState();
-        logActivity(`${name} bevállalta a miskolci program szervezést`);
-        renderKulso();
-        toast(`${name} bevállalta ✓`);
-    });
-
-    $('#btnMiskolciClear').addEventListener('click', () => {
-        if (!confirm(`Biztos lemondod a szerepet? (${state.miskolciFelelos})`)) return;
-        const was = state.miskolciFelelos;
-        state.miskolciFelelos = null;
-        saveState();
-        logActivity(`${was} lemondta a miskolci program szervezést`);
-        renderKulso();
     });
 
     $('#btnShare').addEventListener('click', sharePage);
