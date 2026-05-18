@@ -87,10 +87,31 @@ function loadState() {
         if (!raw) return defaultState();
         const def = defaultState();
         const parsed = JSON.parse(raw);
-        return { ...def, ...parsed };
+        return migrateState({ ...def, ...parsed });
     } catch {
         return defaultState();
     }
+}
+
+// Egyszeri, biztonságos migráció a régi (törölt funkciós) mentett állapotokhoz.
+// Idempotens: új állapotra is lefuthat változtatás nélkül.
+function migrateState(s) {
+    if (!s || typeof s !== 'object') return s;
+    // Törölt funkciók maradék mezői (Szavazás / Szervezés)
+    delete s.polls;
+    delete s.kulsoFelelos;
+    delete s.miskolciFelelos;
+    delete s.customCategories;
+    // Kassza: a régi "poker buy-in" helyett "Pogány induló koncert VIP jegy"
+    if (!s.costs || typeof s.costs !== 'object') {
+        s.costs = defaultState().costs;
+    } else {
+        if (s.costs.concert === undefined || s.costs.concert === null) {
+            s.costs.concert = 10000;
+        }
+        delete s.costs.poker;
+    }
+    return s;
 }
 
 function defaultState() {
@@ -134,7 +155,7 @@ async function syncFromServer({ silent = false } = {}) {
         if (data && data.state && typeof data.version === 'number') {
             if (data.version > serverVersion) {
                 serverVersion = data.version;
-                state = { ...defaultState(), ...data.state };
+                state = migrateState({ ...defaultState(), ...data.state });
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
                 renderAll();
             } else {
